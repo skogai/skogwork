@@ -1,0 +1,38 @@
+# Copy to ~/.config/skogwork/config.toml
+# Per-project overrides go in <project>/.skogwork.toml with the same shape.
+
+[agent]
+# model = "claude-opus-5"
+permission_mode = "acceptEdits"     # default | acceptEdits | plan | bypassPermissions | dontAsk
+skills = "all"                      # "all" | ["pdf", "docx"] | []
+setting_sources = ["user", "project"]   # required for skill discovery
+
+tools = [
+  "Read", "Write", "Edit", "Glob", "Grep", "Bash",
+  "WebFetch", "WebSearch", "TodoWrite", "Task", "Skill",
+]
+
+# Extra roots the agent may touch beyond cwd
+add_dirs = ["~/git/skogai"]
+
+# max_budget_usd = 5.0
+
+[env]
+# Passed to the CLI subprocess
+# BASH_DEFAULT_TIMEOUT_MS = "120000"
+
+# --- MCP servers -------------------------------------------------------
+# Merged over any .mcp.json in the project. ${VARS} expand from your env.
+
+[mcp.notion]
+command = "npx"
+args = ["-y", "@notionhq/notion-mcp-server"]
+env = { NOTION_TOKEN = "${NOTION_TOKEN}" }
+
+[mcp.skogai]
+command = "uv"
+args = ["run", "--directory", "/home/skogix/git/skogai", "skogcli", "mcp"]
+
+[mcp.cloudflare]
+type = "sse"
+url = "https://bindings.mcp.cloudflare.com/sse"
