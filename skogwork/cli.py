@@ -29,15 +29,13 @@ def build_parser() -> argparse.ArgumentParser:
                    help="permission mode")
     p.add_argument("--skills", help="comma-separated skill names, or 'all' / 'none'")
     p.add_argument("--tools", help="comma-separated allowed tools (replaces defaults)")
-    p.add_argument("--budget", type=float, metavar="USD", help="max spend for the session")
     p.add_argument("--sessions", action="store_true", help="list recent sessions and exit")
     p.add_argument("--config", action="store_true", help="print resolved config and exit")
     return p
 
 
 def _overrides(args: argparse.Namespace) -> dict:
-    ov: dict = {"model": args.model, "permission_mode": args.permission_mode,
-                "max_budget_usd": args.budget}
+    ov: dict = {"model": args.model, "permission_mode": args.permission_mode}
     if args.tools:
         ov["allowed_tools"] = [t.strip() for t in args.tools.split(",") if t.strip()]
     if args.skills:
@@ -85,7 +83,6 @@ async def one_shot(cfg, prompt: str, resume: str | None) -> int:
             code = 1 if message.is_error else 0
             if entry:
                 entry.turns = message.num_turns
-                entry.cost_usd = message.total_cost_usd or 0.0
                 entry.updated_at = time.time()
                 store.record(entry)
     return code
@@ -150,10 +147,7 @@ def _explain(exc: Exception) -> None:
     text = str(exc)
     if isinstance(exc, ProcessError) or "error result" in text or "auth" in text.lower():
         console.print(f"[red]agent failed:[/red] {text}")
-        console.print(
-            "[dim]most often auth: run [bold]claude[/bold] once to log in, "
-            "or export ANTHROPIC_API_KEY.[/dim]"
-        )
+        console.print("[dim]most often auth: run [bold]claude[/bold] once to log in.[/dim]")
         return
     console.print(f"[red]{type(exc).__name__}:[/red] {text}")
 

@@ -23,8 +23,7 @@ Or run from the source tree without installing:
 uv run --directory /path/to/skogwork skogwork
 ```
 
-Auth comes from the same place Claude Code gets it — an existing `claude` login, or
-`ANTHROPIC_API_KEY` in the environment.
+Auth comes from the same place Claude Code gets it — an existing `claude` login.
 
 ## Use
 
@@ -38,7 +37,7 @@ skogwork --sessions            # list recent sessions across all directories
 skogwork --config              # dump resolved options and exit
 ```
 
-In the REPL: `/help`, `/model`, `/mode`, `/mcp`, `/skills`, `/tools`, `/cost`,
+In the REPL: `/help`, `/model`, `/mode`, `/mcp`, `/skills`, `/tools`,
 `/new`, `/sessions`, `/cwd`, `/quit`.
 
 ## Config
@@ -66,6 +65,5 @@ controlled by `[agent] tools` only.
 
 - `permission_mode = "acceptEdits"` is the default here. Use `"plan"` for read-only
   reconnaissance, `"dontAsk"` to hard-deny anything outside the tool list.
-- `--budget` maps to `max_budget_usd`; the turn stops with an error result when hit.
 - Transcripts themselves live wherever the bundled CLI puts them; skogwork only
   indexes the ids so `-c` works.

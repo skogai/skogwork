@@ -26,7 +26,6 @@ class Entry:
     started_at: float
     updated_at: float
     turns: int = 0
-    cost_usd: float = 0.0
     title: str = ""
 
 

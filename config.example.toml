@@ -15,8 +15,6 @@ tools = [
 # Extra roots the agent may touch beyond cwd
 add_dirs = ["~/git/skogai"]
 
-# max_budget_usd = 5.0
-
 [env]
 # Passed to the CLI subprocess
 # BASH_DEFAULT_TIMEOUT_MS = "120000"

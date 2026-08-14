@@ -126,8 +126,5 @@ class StreamRenderer:
             detail = f": {errs}" if errs else ""
             console.print(f"[red]turn failed[/red] ({message.subtype}){detail}")
             return
-        cost = message.total_cost_usd
         parts = [f"{message.num_turns} turns", f"{message.duration_ms / 1000:.1f}s"]
-        if cost:
-            parts.append(f"${cost:.4f}")
         console.print(f"[dim]{' · '.join(parts)}[/dim]")

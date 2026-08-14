@@ -23,7 +23,6 @@ SLASH = [
     "/mcp",
     "/skills",
     "/tools",
-    "/cost",
     "/new",
     "/sessions",
     "/cwd",
@@ -37,7 +36,6 @@ HELP = """\
   /mcp               MCP server status
   /skills            skills loaded this session
   /tools             allowed tools
-  /cost              session cost so far
   /new               start a fresh session in this directory
   /sessions          recent sessions for this directory
   /cwd               show working directory
@@ -55,7 +53,6 @@ class Repl:
         self.entry: store.Entry | None = None
         self.session_id: str | None = None
         self.skills: list[str] = []
-        self.cost = 0.0
         self.renderer = StreamRenderer(streaming=True)
 
         hist = store.STATE_DIR / "history"
@@ -93,7 +90,6 @@ class Repl:
         if self.entry is None:
             return
         self.entry.updated_at = time.time()
-        self.entry.cost_usd = self.cost
         store.record(self.entry)
 
     # -- main loop --------------------------------------------------------
@@ -141,7 +137,6 @@ class Repl:
                     self._on_system(message, text)
                     self.renderer.system(message)
                 elif isinstance(message, ResultMessage):
-                    self.cost += message.total_cost_usd or 0.0
                     self.session_id = message.session_id
                     if self.entry:
                         self.entry.turns += message.num_turns
@@ -208,9 +203,6 @@ class Repl:
         elif cmd == "/tools":
             console.print("  " + ", ".join(self.cfg.allowed_tools))
 
-        elif cmd == "/cost":
-            console.print(f"[dim]${self.cost:.4f} this session[/dim]")
-
         elif cmd == "/cwd":
             console.print(f"[dim]{self.cfg.cwd}[/dim]")
 
@@ -227,7 +219,6 @@ class Repl:
             self.entry = None
             self.session_id = None
             self.resume = None
-            self.cost = 0.0
             await self.start()
 
         else:

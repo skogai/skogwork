@@ -59,7 +59,6 @@ class Config:
     system_prompt: Any = None
     add_dirs: list[str] = field(default_factory=list)
     env: dict[str, str] = field(default_factory=dict)
-    max_budget_usd: float | None = None
 
     def to_options_kwargs(self) -> dict[str, Any]:
         kw: dict[str, Any] = {
@@ -78,8 +77,6 @@ class Config:
             kw["model"] = self.model
         if self.system_prompt is not None:
             kw["system_prompt"] = self.system_prompt
-        if self.max_budget_usd is not None:
-            kw["max_budget_usd"] = self.max_budget_usd
         return kw
 
 
@@ -147,8 +144,6 @@ def load(cwd: Path, overrides: dict[str, Any] | None = None) -> Config:
         cfg.add_dirs = [str(Path(p).expanduser()) for p in agent["add_dirs"]]
     if "system_prompt" in agent:
         cfg.system_prompt = agent["system_prompt"]
-    if "max_budget_usd" in agent:
-        cfg.max_budget_usd = float(agent["max_budget_usd"])
 
     cfg.env = dict(raw.get("env", {}))
     cfg.mcp_servers = _expand_env(mcp)

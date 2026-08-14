@@ -8,27 +8,6 @@ skogwork is a good thin terminal wrapper around Claude Code, but it is not yet e
 
 The immediate priorities are secret redaction, project trust, safer defaults, and session-store hardening.
 
-## Claude subscription and authentication
-
-Live `claude auth status` verification found:
-
-- Authentication method: `claude.ai`
-- API provider: Anthropic first-party
-- Subscription: Claude Pro
-- `ANTHROPIC_API_KEY`: absent
-- `CLAUDE_CODE_OAUTH_TOKEN`: absent
-
-Therefore, skogwork currently draws from the logged-in Claude Pro subscription rather than separately billed API-key usage. Anthropic currently says Agent SDK and `claude -p` usage still draws from subscription limits, although this policy is explicitly under review.
-
-References:
-
-- [Use the Claude Agent SDK with your Claude plan](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan)
-- [Use Claude Code with your Pro or Max plan](https://support.claude.com/en/articles/11145838-use-claude-code-with-your-pro-or-max-plan)
-
-If `ANTHROPIC_API_KEY` is later exported, Claude Code gives it precedence. That changes usage to separately billed API usage.
-
-The `/cost` command and `--budget` option use the SDK's USD cost accounting. On the current Pro authentication path, this should not be interpreted as the exact amount charged to the user's payment method. It is chiefly a usage estimate and budget control.
-
 ## Findings
 
 ### 1. Required: resolved configuration can disclose secrets
@@ -124,7 +103,6 @@ Recommended changes:
 - No permission-review interface beyond Claude Code modes.
 - No searchable transcript UI, attachments, previews, or background-task management.
 - Session storage is only an index over Claude Code's underlying transcripts.
-- No account, quota, or billing-source indicator in the interface.
 
 ## Verdict
 
@@ -138,7 +116,6 @@ The architecture is appropriately small and understandable. The principal risks 
 - CLI help executed successfully.
 - Configuration resolution completed successfully.
 - A session-store smoke test passed.
-- Claude authentication and subscription type were verified live.
 - The installed virtual environment uses `claude-agent-sdk` 0.2.137.
 - No automated test suite was present to run.
 - No project or user skogwork configuration was present during the review.
