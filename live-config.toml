@@ -1,0 +1,30 @@
+# Copy to ~/.config/skogwork/config.toml
+# Per-project overrides go in <project>/.skogwork.toml with the same shape.
+
+[agent]
+model = "claude-sonnet-5"
+permission_mode = "acceptEdits"     # default | acceptEdits | plan | bypassPermissions | dontAsk
+skills = []                      # "all" | ["pdf", "docx"] | []
+setting_sources = ["user"]   # required for skill discovery
+
+tools = [
+  "Read", "Write", "Edit", "Glob", "Grep", "Bash", "TodoWrite", "Task", "Skill",
+]
+
+# Extra roots the agent may touch beyond cwd
+add_dirs = ["~/skogai"]
+
+# max_budget_usd = 5.0
+
+[env]
+
+ENABLE_CLAUDEAI_MCP_SERVERS = false
+# Passed to the CLI subprocess
+# BASH_DEFAULT_TIMEOUT_MS = "120000"
+
+# --- MCP servers -------------------------------------------------------
+# Merged over any .mcp.json in the project. ${VARS} expand from your env.
+
+[mcp.skogai]
+type = "http"
+url = "http://localhost:3000/mcp"
