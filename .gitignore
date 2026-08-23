@@ -2,3 +2,4 @@
 /.skogai/config/script_metadata.json
 /.claude/worktrees
 /config.toml
+/tmp/
