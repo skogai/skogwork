@@ -51,11 +51,13 @@ class Config:
     cwd: Path
     model: str | None = None
     permission_mode: str = "acceptEdits"
+    tools: list[str] | None = None
     allowed_tools: list[str] = field(default_factory=lambda: list(DEFAULT_TOOLS))
     disallowed_tools: list[str] = field(default_factory=list)
     setting_sources: list[str] = field(default_factory=lambda: ["user", "project"])
     skills: list[str] | str = "all"
     mcp_servers: dict[str, Any] = field(default_factory=dict)
+    strict_mcp_config: bool = False
     system_prompt: Any = None
     add_dirs: list[str] = field(default_factory=list)
     env: dict[str, str] = field(default_factory=dict)
@@ -64,11 +66,13 @@ class Config:
         kw: dict[str, Any] = {
             "cwd": str(self.cwd),
             "permission_mode": self.permission_mode,
+            "tools": self.tools,
             "allowed_tools": self.allowed_tools,
             "disallowed_tools": self.disallowed_tools,
             "setting_sources": self.setting_sources,
             "skills": self.skills,
             "mcp_servers": self.mcp_servers,
+            "strict_mcp_config": self.strict_mcp_config,
             "add_dirs": self.add_dirs,
             "env": self.env,
             "include_partial_messages": True,
@@ -133,7 +137,9 @@ def load(cwd: Path, overrides: dict[str, Any] | None = None) -> Config:
     if "permission_mode" in agent:
         cfg.permission_mode = agent["permission_mode"]
     if "tools" in agent:
-        cfg.allowed_tools = list(agent["tools"])
+        cfg.tools = list(agent["tools"])
+    if "allowed_tools" in agent:
+        cfg.allowed_tools = list(agent["allowed_tools"])
     if "disallowed_tools" in agent:
         cfg.disallowed_tools = list(agent["disallowed_tools"])
     if "setting_sources" in agent:
@@ -144,6 +150,8 @@ def load(cwd: Path, overrides: dict[str, Any] | None = None) -> Config:
         cfg.add_dirs = [str(Path(p).expanduser()) for p in agent["add_dirs"]]
     if "system_prompt" in agent:
         cfg.system_prompt = agent["system_prompt"]
+    if "strict_mcp_config" in agent:
+        cfg.strict_mcp_config = agent["strict_mcp_config"]
 
     cfg.env = dict(raw.get("env", {}))
     cfg.mcp_servers = _expand_env(mcp)
@@ -152,7 +160,9 @@ def load(cwd: Path, overrides: dict[str, Any] | None = None) -> Config:
         if value is not None:
             setattr(cfg, key, value)
 
-    # Skill tool must be present when an explicit tool list is given.
+    # Skill must be visible and approved when an explicit tool list is given.
+    if cfg.skills and cfg.tools is not None and "Skill" not in cfg.tools:
+        cfg.tools.append("Skill")
     if cfg.skills and "Skill" not in cfg.allowed_tools:
         cfg.allowed_tools.append("Skill")
 
