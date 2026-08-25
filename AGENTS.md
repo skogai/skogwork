@@ -1,7 +1,5 @@
 # AGENTS.md
 
-This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
-
 ## What this is
 
 skogwork is a local, terminal-only reimplementation of Cowork built on the Codex Agent SDK: an
