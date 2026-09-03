@@ -16,6 +16,52 @@ agent REPL with real file tools, skill discovery, MCP connectors, and persistent
 no JS, no browser, no daemon. It's a thin orchestration layer; nearly all agent behavior comes from
 `claude_agent_sdk` (`ClaudeSDKClient` / `query`), not from code in this repo.
 
+The goal of the repo is *not* to build a Claude Code harness replica. Instead it builds what's
+needed, when it's needed, adding complexity deliberately rather than fighting against Claude Code's
+~600,000 lines of JavaScript to do what's needed. It's meant to stay a lean, personal way to run
+Claude Code — deliberately scoped to the features actually needed, not a general-purpose Cowork
+replacement.
+
+Cowork's four moving parts, run locally from a terminal:
+
+| Cowork | skogwork |
+| --- | --- |
+| agent loop + file tools | `ClaudeSDKClient` with `Read/Write/Edit/Bash/Glob/Grep` against real `cwd` |
+| skills | filesystem discovery via `setting_sources = ["user", "project"]`, `skills = "all"` |
+| connectors | `mcp_servers` from `config.toml` `[mcp.*]` and/or project `.mcp.json` |
+| session history | session ids indexed per project dir in `~/.local/state/skogwork/sessions.json` |
+
+No JS, no browser, no daemon. The Agent SDK bundles its own CLI; you only need Python.
+
+### Glossary
+
+**Bloat**: Any context, token, or compute spend a task didn't need — whether that's an app-shell
+dependency (GUI, daemon, browser) or an oversized agent invocation for a subtask a cheaper path
+could handle. Example: generating a commit message by loading the full agent (~85k tokens) instead
+of feeding a local model just the diff (~4k tokens). *Avoid*: overhead, cruft.
+
+**Delegation queue**: The mechanism by which skogwork's agent hands off a subtask it judges "quick"
+to something outside its own main execution path. skogwork's responsibility ends at enqueueing — it
+does not choose or manage where the task actually runs. *Avoid*: routing, offloading.
+
+**Gateway router** (external, referenced only): The system, outside skogwork, responsible for
+deciding where a delegated task actually executes (e.g. a local model, a cheaper hosted model).
+skogwork enqueues to it but does not implement it.
+
+## Install
+
+```sh
+uv tool install --from /path/to/skogwork skogwork
+```
+
+Or run from the source tree without installing:
+
+```sh
+uv run --directory /path/to/skogwork skogwork
+```
+
+Auth comes from the same place Claude Code gets it — an existing `claude` login.
+
 ## Commands
 
 ```sh
@@ -29,8 +75,36 @@ skogwork --config                          # print fully-resolved config and exi
 skogwork --sessions                        # list recent sessions across all dirs
 ```
 
+In the REPL: `/help`, `/model`, `/mode`, `/mcp`, `/skills`, `/tools`, `/new`, `/sessions`, `/cwd`,
+`/quit`.
+
 There is no build step, lint config, or test suite in this repo — verify changes by running the
 CLI directly (`uv run --directory . skogwork ...`) and exercising the affected path.
+
+## Config
+
+`~/.config/skogwork/config.toml`, overridden by `<project>/.skogwork.toml`, overridden by CLI
+flags. See `config.example.toml`.
+
+- `permission_mode = "acceptEdits"` is the default here. Use `"plan"` for read-only
+  reconnaissance, `"dontAsk"` to hard-deny anything outside the tool list.
+- Transcripts themselves live wherever the bundled CLI puts them; skogwork only indexes the ids
+  so `-c` works.
+
+## Skills
+
+Drop a directory containing `SKILL.md` into either location:
+
+```
+~/.claude/skills/<name>/SKILL.md      # available everywhere
+<project>/.claude/skills/<name>/SKILL.md
+```
+
+`setting_sources` must include `"user"` and/or `"project"` or nothing is discovered — that is the
+single most common reason skills go missing. `/skills` in the REPL lists what actually loaded.
+
+Note: `allowed-tools` in SKILL.md frontmatter is ignored by the SDK. Tool access is controlled by
+`[agent] tools` only.
 
 ## Architecture
 
@@ -66,7 +140,7 @@ or whether it belongs in the shared `render.py`.
 ## Key behaviors to preserve
 
 - Skill discovery requires `setting_sources` to include `"user"` and/or `"project"` — this is
-  called out in the README as the most common way skills silently go missing.
+  called out above as the most common way skills silently go missing.
 - `allowed-tools` in a skill's `SKILL.md` frontmatter is ignored by the SDK; tool access is
   controlled solely by `[agent] tools` in config.
 - When an explicit tool list is configured, `config.load()` force-appends `"Skill"` if skills are

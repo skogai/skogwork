@@ -1,4 +1,0 @@
-interface:
-  display_name: "SkogAI Architecture"
-  short_description: "Record features, decisions, and ownership"
-  default_prompt: "Use $skogai-architecture to classify this change and update the appropriate architecture record."
