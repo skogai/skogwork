@@ -3,34 +3,66 @@
 
 [agent]
 # model = "claude-opus-5"
-permission_mode = "acceptEdits"     # default | acceptEdits | plan | bypassPermissions | dontAsk
-skills = "all"                      # "all" | ["pdf", "docx"] | []
-setting_sources = ["user", "project"]   # required for skill discovery
+permission_mode = "acceptEdits" # default | acceptEdits | plan | bypassPermissions | dontAsk
+skills = "all"                  # "all" | ["pdf", "docx"] | []
+setting_sources = ["project"]   # required for skill discovery
 
 tools = [
-  "Read", "Write", "Edit", "Glob", "Grep", "Bash",
-  "WebFetch", "WebSearch", "TodoWrite", "Task", "Skill",
+    # "Read",
+    # "Write",
+    # "Edit",
+    # "Glob",
+    # "Grep",
+    # "Bash",
+    # "WebFetch",
+    # "WebSearch",
+    # "TodoWrite",
+    # "Task",
+    "Skill",
+]
+
+# Hard vetoes even under acceptEdits/bypassPermissions (scoped Bash rules work here).
+disallowed_tools = [
+    "Bash(sudo *)",
+    "Bash(chmod 777 *)",
+    "Bash(curl * | bash)",
+    "Bash(wget * | bash)",
+    "Bash(ssh *)",
+    "Bash(> /dev/*)",
+    "Bash(dd *)",
 ]
 
 # Extra roots the agent may touch beyond cwd
-add_dirs = ["~/git/skogai"]
+# add_dirs = []
 
 [env]
 # Passed to the CLI subprocess
 # BASH_DEFAULT_TIMEOUT_MS = "120000"
 
+# "Nothing extra" baseline toggles (see SETTINGS.md) - uncomment to test cost/behavior:
+# CLAUDE_CODE_DISABLE_AUTO_MEMORY = "1"          # stop ~/.claude/projects/<proj>/memory read/write
+CLAUDE_CODE_DISABLE_BUNDLED_SKILLS = "1" # remove bundled skills/workflows entirely
+DISABLE_DOCTOR_COMMAND = "1"             # hide /doctor from the model
+ENABLE_CLAUDEAI_MCP_SERVERS = "false"    # block claude.ai connector auto-load
+CLAUDE_CODE_DISABLE_ARTIFACT = "1"       # drop the Artifact tool
+
 # --- MCP servers -------------------------------------------------------
 # Merged over any .mcp.json in the project. ${VARS} expand from your env.
+# strict_mcp_config = true # in [agent]; also blocks stray .mcp.json / connectors
 
-[mcp.notion]
-command = "npx"
-args = ["-y", "@notionhq/notion-mcp-server"]
-env = { NOTION_TOKEN = "${NOTION_TOKEN}" }
+# [mcp.notion]
+# command = "npx"
+# args = ["-y", "@notionhq/notion-mcp-server"]
+# env = { NOTION_TOKEN = "${NOTION_TOKEN}" }
 
-[mcp.skogai]
-command = "uv"
-args = ["run", "--directory", "/home/skogix/git/skogai", "skogcli", "mcp"]
+# [mcp.skogai]
+# command = "uv"
+# args = ["run", "--directory", "/home/skogix/git/skogai", "skogcli", "mcp"]
 
 [mcp.cloudflare]
 type = "sse"
 url = "https://bindings.mcp.cloudflare.com/sse"
+
+[mcp.skogmcp]
+type = "http"
+url = "https://mcp.skogai.se/mcp"

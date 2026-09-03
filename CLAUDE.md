@@ -79,7 +79,11 @@ In the REPL: `/help`, `/model`, `/mode`, `/mcp`, `/skills`, `/tools`, `/new`, `/
 `/quit`.
 
 There is no build step, lint config, or test suite in this repo — verify changes by running the
-CLI directly (`uv run --directory . skogwork ...`) and exercising the affected path.
+CLI directly (`uv run --directory . skogwork ...`) and exercising the affected path. For config
+changes specifically, use `skogwork --config` to see the fully-resolved output — it exercises the
+real `config.py:load()` path (merge order, MCP `.mcp.json` merge, `${VAR}` expansion, the
+`Skill`-append rule), which a standalone `tomllib`/`json` snippet does not. Reach for the project's
+own commands before ad-hoc scripting.
 
 ## Config
 
