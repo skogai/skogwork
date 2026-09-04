@@ -48,6 +48,36 @@ does not choose or manage where the task actually runs. *Avoid*: routing, offloa
 deciding where a delegated task actually executes (e.g. a local model, a cheaper hosted model).
 skogwork enqueues to it but does not implement it.
 
+## SDK reference docs
+
+`docs/sdk/` is a local mirror of the Claude Agent SDK documentation — the library this whole repo
+is a thin wrapper around (see "What this is" above). Consult it before guessing at SDK behavior or
+reaching for a workaround; skogwork's `config.py`/`cli.py`/`repl.py` only expose a subset of what
+the SDK supports, so the answer to "can the SDK do X" is usually in here, not in this repo's code.
+
+Reach for specific files by topic:
+
+- `overview.md`, `quickstart.md`, `python.md` — SDK basics, install, first client
+- `agent-loop.md`, `streaming-vs-single-mode.md`, `streaming-output.md` — how `query()` /
+  `ClaudeSDKClient` drive turns; relevant to `cli.py`/`repl.py`
+- `permissions.md` — `tools` / `allowed_tools` / `disallowed_tools` / permission modes; the source
+  of truth behind the "Config" and "Skills" sections below
+- `skills.md` — skill discovery mechanics behind `setting_sources`
+- `mcp.md` — MCP server wiring, relevant to `[mcp.*]` config and `.mcp.json` merging
+- `subagents.md`, `custom-tools.md`, `hooks.md` — extension points not yet used in this repo
+- `session-storage.md`, `sessions.md` — how the bundled CLI persists transcripts; relevant to
+  `store.py`
+- `structured-outputs.md`, `todo-tracking.md`, `tool-search.md`, `file-checkpointing.md`,
+  `cost-tracking.md`, `observability.md` — feature areas not yet wired into skogwork; check here
+  before building a custom version of any of them
+- `troubleshooting.md`, `migration-guide.md` — when an SDK call errors or behaves unexpectedly
+- `claude-code-features.md` — parity notes between the SDK and the full Claude Code CLI, useful for
+  understanding what skogwork intentionally doesn't reimplement
+- `secure-deployment.md`, `hosting.md`, `plugins.md`, `user-input.md`,
+  `modifying-system-prompts.md`, `examples.md`, `typescript.md`, `typescript-v2-preview.md` — round
+  out the rest; `typescript*.md` covers the JS/TS SDK and is background only, since this repo is
+  Python-only
+
 ## Install
 
 ```sh
