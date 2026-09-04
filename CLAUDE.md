@@ -92,6 +92,11 @@ flags. See `config.example.toml`.
 
 - `permission_mode = "acceptEdits"` is the default here. Use `"plan"` for read-only
   reconnaissance, `"dontAsk"` to hard-deny anything outside the tool list.
+- `[agent] tools` defaults to `["Skill"]` — a deliberately bare baseline, not the full
+  `Read`/`Write`/`Edit`/`Bash`/... surface. Verified (via `skogwork --config` and one-shot probes
+  through the real CLI, see `SETTINGS.md`) that `tools` genuinely restricts what the model can see,
+  not just what it's pre-approved to call — with `tools=["Skill"]` the model reports zero built-in
+  tools other than `Skill`. Uncomment entries in `config.example.toml` to build back up.
 - Transcripts themselves live wherever the bundled CLI puts them; skogwork only indexes the ids
   so `-c` works.
 
