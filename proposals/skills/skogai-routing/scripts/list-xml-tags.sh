@@ -2,10 +2,19 @@
 set -euo pipefail
 
 if [ "$#" -eq 0 ]; then
-  set -- SKILL.md workflows references templates
+  SKILL_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+  set -- "$SKILL_ROOT/SKILL.md" "$SKILL_ROOT/workflows" "$SKILL_ROOT/references" "$SKILL_ROOT/templates"
 fi
 
-find "$@" -type f \( -name '*.md' -o -name 'SKILL.md' \) -print 2>/dev/null |
+existing=()
+for path in "$@"; do
+  [ -e "$path" ] && existing+=("$path")
+done
+if [ "${#existing[@]}" -eq 0 ]; then
+  exit 0
+fi
+
+find "${existing[@]}" -type f \( -name '*.md' -o -name 'SKILL.md' \) -print 2>/dev/null |
   sort |
   while IFS= read -r file; do
     tags=$({ grep -Eoh '</?[A-Za-z][A-Za-z0-9_-]*[^>]*>' "$file" 2>/dev/null || true; } |
