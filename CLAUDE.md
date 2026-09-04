@@ -48,14 +48,18 @@ does not choose or manage where the task actually runs. *Avoid*: routing, offloa
 deciding where a delegated task actually executes (e.g. a local model, a cheaper hosted model).
 skogwork enqueues to it but does not implement it.
 
-## SDK reference docs
+## Docs mirrors
 
-`docs/sdk/` is a local mirror of the Claude Agent SDK documentation — the library this whole repo
-is a thin wrapper around (see "What this is" above). Consult it before guessing at SDK behavior or
-reaching for a workaround; skogwork's `config.py`/`cli.py`/`repl.py` only expose a subset of what
-the SDK supports, so the answer to "can the SDK do X" is usually in here, not in this repo's code.
+Two local doc mirrors back this file. Consult them before guessing at SDK/CLI behavior or reaching
+for a workaround — skogwork's `config.py`/`cli.py`/`repl.py` only expose a subset of what's
+available, so the answer to "can this do X" is usually in one of these, not in this repo's code.
+When the two disagree or overlap, `docs/sdk/` wins for anything going through `ClaudeAgentOptions`
+(that's what this repo actually calls); `docs/claude-code/` is the only source for CLI flags and
+env vars, since the SDK docs don't cover those.
 
-Reach for specific files by topic:
+### `docs/sdk/` — Agent Sdk (Python/TypeScript) reference
+
+The library this whole repo is a thin wrapper around (see "What this is" above).
 
 - `overview.md`, `quickstart.md`, `python.md` — SDK basics, install, first client
 - `agent-loop.md`, `streaming-vs-single-mode.md`, `streaming-output.md` — how `query()` /
@@ -77,6 +81,25 @@ Reach for specific files by topic:
   `modifying-system-prompts.md`, `examples.md`, `typescript.md`, `typescript-v2-preview.md` — round
   out the rest; `typescript*.md` covers the JS/TS SDK and is background only, since this repo is
   Python-only
+
+### `docs/claude-code/` — CLI / product reference
+
+The full Claude Code CLI docs, useful for anything that's a CLI flag or env var rather than an SDK
+option — the SDK reads Claude Code's underlying behavior (env vars, bundled tool defaults, task-tool
+availability) but doesn't document it itself.
+
+- `env-vars.md` — every env var Claude Code reads, including the ones worth setting in skogwork's
+  `[env]` block (see "Settings deep dive" below)
+- `cli-reference.md` — every CLI flag; useful as ground truth for what `ClaudeAgentOptions` fields
+  actually map to, since the SDK is a thin wrapper over the same binary
+- `features-overview.md` — the canonical "what costs context, and how much" breakdown by feature
+- `permission-modes.md`, `settings-reference.md` — deeper detail than `docs/sdk/permissions.md` on
+  mode edge cases and `settings.json` keys
+- `headless.md` — `--bare`/`-p` behavior, relevant since skogwork's one-shot mode is conceptually
+  the same as headless CLI usage
+- `sub-agents.md`, `hooks.md`, `hooks-guide.md`, `skills.md`, `mcp.md` — CLI-level counterparts to
+  the `docs/sdk/` pages of the same topic, with more product detail (e.g. built-in `Explore`/`Plan`
+  agent behavior) than the SDK pages carry
 
 ## Install
 
