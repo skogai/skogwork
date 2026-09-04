@@ -108,7 +108,9 @@ Drop a directory containing `SKILL.md` into either location:
 single most common reason skills go missing. `/skills` in the REPL lists what actually loaded.
 
 Note: `allowed-tools` in SKILL.md frontmatter is ignored by the SDK. Tool access is controlled by
-`[agent] tools` only.
+`[agent]` config, split across three fields: `tools` restricts which tools are even loaded,
+`allowed_tools` auto-approves a subset without a restriction, and `disallowed_tools` hard-vetoes
+(including scoped rules like `Bash(rm *)`). See `SETTINGS.md` for the full breakdown.
 
 ## Architecture
 
@@ -146,6 +148,7 @@ or whether it belongs in the shared `render.py`.
 - Skill discovery requires `setting_sources` to include `"user"` and/or `"project"` — this is
   called out above as the most common way skills silently go missing.
 - `allowed-tools` in a skill's `SKILL.md` frontmatter is ignored by the SDK; tool access is
-  controlled solely by `[agent] tools` in config.
+  controlled by `[agent] tools` (restricts), `allowed_tools` (auto-approves), and
+  `disallowed_tools` (vetoes) in config — not by any single one of them.
 - When an explicit tool list is configured, `config.load()` force-appends `"Skill"` if skills are
   enabled — don't reintroduce a path where skills are configured but the `Skill` tool is missing.
