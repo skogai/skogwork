@@ -7,29 +7,14 @@ permission_mode = "acceptEdits" # default | acceptEdits | plan | bypassPermissio
 skills = "all"                  # "all" | ["pdf", "docx"] | []
 setting_sources = ["project"]   # required for skill discovery
 
+# Bare baseline: only Skill loaded, everything else stripped from context.
+# Verified via `skogwork --config` + one-shot probes (see SETTINGS.md) that `tools`
+# actually restricts what the model can see, not just what it can call without asking.
+# Uncomment entries below to build back up deliberately.
 tools = [
-    # "Read",
-    # "Write",
-    # "Edit",
-    # "Glob",
-    # "Grep",
-    # "Bash",
-    # "WebFetch",
-    # "WebSearch",
-    # "TodoWrite",
-    # "Task",
-    "Skill",
-]
-
-# Hard vetoes even under acceptEdits/bypassPermissions (scoped Bash rules work here).
-disallowed_tools = [
-    "Bash(sudo *)",
-    "Bash(chmod 777 *)",
-    "Bash(curl * | bash)",
-    "Bash(wget * | bash)",
-    "Bash(ssh *)",
-    "Bash(> /dev/*)",
-    "Bash(dd *)",
+  # "Read", "Write", "Edit", "Glob", "Grep", "Bash",
+  # "WebFetch", "WebSearch", "TodoWrite", "Task",
+  "Skill",
 ]
 
 # Extra roots the agent may touch beyond cwd
